@@ -13,14 +13,23 @@ type OrderRepository interface {
 	FindByID(id string) (*model.Order, error)
 }
 
+// OrderCache is the narrow interface for order caching.
+// Service depends on this abstraction, not on a concrete repo type.
+// This is how cache logic stays inside the service layer.
+type OrderCache interface {
+	Get(id string) (*model.Order, bool)
+	Set(o *model.Order)
+}
+
 // OrderService implements order business logic.
 type OrderService struct {
-	repo OrderRepository
+	repo  OrderRepository
+	cache OrderCache
 }
 
 // NewOrderService creates an OrderService.
-func NewOrderService(repo OrderRepository) *OrderService {
-	return &OrderService{repo: repo}
+func NewOrderService(repo OrderRepository, cache OrderCache) *OrderService {
+	return &OrderService{repo: repo, cache: cache}
 }
 
 // Create validates and persists a new order.
@@ -50,10 +59,36 @@ func (s *OrderService) Create(userID string, items []model.OrderItem) (*model.Or
 		return nil, fmt.Errorf("saving order: %w", err)
 	}
 
+	if s.cache != nil {
+		s.cache.Set(o)
+	}
+
 	return o, nil
 }
 
 // Get retrieves an order by ID.
 func (s *OrderService) Get(id string) (*model.Order, error) {
 	return s.repo.FindByID(id)
+}
+
+// GetWithCache retrieves an order by ID, checking cache first.
+// Cache logic lives here - not in the handler. This is the correct pattern.
+// Handler calls GetWithCache; it does not know about the cache at all.
+func (s *OrderService) GetWithCache(id string) (*model.Order, error) {
+	if s.cache != nil {
+		if o, ok := s.cache.Get(id); ok {
+			return o, nil
+		}
+	}
+
+	o, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if s.cache != nil {
+		s.cache.Set(o)
+	}
+
+	return o, nil
 }
