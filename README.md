@@ -4,6 +4,15 @@ Intentionally broken Go project used to demonstrate archlint during the Stachka 
 
 ---
 
+## Live demo scenario (recommended for talks)
+
+See [demo-scenario/README.md](demo-scenario/README.md) for a step-by-step live coding scenario.
+
+The scenario shows a developer adding features (logging, caching, metrics) to a clean handler.
+archlint fires a fan-out violation in real time at step 2. Total runtime: ~3 minutes.
+
+---
+
 ## Quick start
 
 ```bash
