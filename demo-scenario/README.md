@@ -224,3 +224,141 @@ Import breakdown per step:
 - The fix is real and fast - no magic, just moving code to the right layer
 - The archlint output names the exact forbidden dependency
 - Total steps fit in 3 minutes with room for questions
+
+---
+
+## Behavioral Graph Demo
+
+A second demo showing **behavioral cycles** in the call graph.
+This is a different class of problem from import layer violations:
+the cycle exists in the runtime call chain, not in the import graph.
+
+### The story
+
+Two services that "need each other": OrderService calls InventoryService
+to check stock. InventoryService calls back into OrderService to validate
+order context before committing a reservation. Each call looks reasonable
+in isolation. Together they form a cycle.
+
+In a monolith this is a hidden coupling. In a microservice split it becomes
+a distributed deadlock. archlint callgraph detects it statically.
+
+### Setup
+
+No file changes needed - the cycle is in `internal/service/`:
+- `internal/service/order_service.go` - `CreateOrder`, `GetOrderDetails`
+- `internal/service/inventory_service.go` - `CheckInventory`, `ReserveForOrder`
+
+### Run the demo
+
+```bash
+# Detect the behavioral cycle from the CreateOrder entry point
+archlint callgraph ./internal --entry "internal/service.OrderService.CreateOrder" --no-puml
+```
+
+Expected output:
+
+```
+Analyzing code: ./internal (language: go)
+Graph built: 9 nodes, 13 edges, depth 3
+YAML: callgraphs/callgraph.yaml
+```
+
+The YAML contains:
+
+```yaml
+stats:
+  cycles_detected: 1
+
+edges:
+  - from: internal/service.GetOrderDetails
+    to: internal/service.CheckInventory
+    call_type: direct
+    line: 66
+    cycle: true
+```
+
+### What the call chain looks like
+
+```
+CreateOrder
+  -> CheckInventory               (inventory domain)
+       -> ReserveForOrder         (inventory domain)
+            -> GetOrderDetails    (order domain - crosses boundary!)
+                 -> CheckInventory  [CYCLE: already visited]
+```
+
+The cycle closes at `GetOrderDetails -> CheckInventory`.
+Both domains are now coupled at runtime.
+
+### Before (clean, step0-behavior-clean.go)
+
+```
+CreateOrder
+  -> inventory.CheckStock  (interface call, leaf)
+  -> repo.Save             (leaf)
+
+cycles_detected: 0
+```
+
+`InventoryService.CheckStock` is a leaf function: it checks a map and returns.
+It does not know about orders. The dependency is one-directional.
+
+### After (cycle, step1-behavior-cycle.go)
+
+```
+CreateOrder
+  -> checkInventoryCycle
+       -> reserveForOrderCycle
+            -> getOrderDetailsCycle
+                 -> checkInventoryCycle  [cycle: true]
+
+cycles_detected: 1
+```
+
+A developer added "validate order context before committing reservation".
+Reasonable. Cyclic.
+
+### What to say on stage (90 sec)
+
+> "Layer violations are visible in the import graph.
+> Behavioral cycles are invisible there - the imports look fine.
+> Both OrderService and InventoryService are in the same package.
+> No forbidden imports. archlint analyze would not catch this.
+>
+> But archlint callgraph traces the actual call chain from an entry point.
+> Watch what happens when I run it against CreateOrder.
+>
+> Nine nodes. Thirteen edges. Depth three. One cycle.
+>
+> GetOrderDetails calls CheckInventory. That edge has cycle: true.
+> The graph closed on itself at depth three.
+>
+> This means you cannot extract InventoryService into a separate microservice
+> without also extracting its dependency on GetOrderDetails.
+> Which means you cannot extract GetOrderDetails without CheckInventory.
+> They are locked together at runtime.
+>
+> The static import graph looked clean. The behavioral graph is not."
+
+### Functional tests
+
+```bash
+go test ./tests/... -v -run TestCheckInventory_Cycle
+go test ./tests/... -v -run TestGetOrderDetails_Cycle
+go test ./tests/... -v -run TestCreateOrder
+```
+
+All tests pass. The depth guard (`depth > 2 -> return true`) prevents
+runtime infinite recursion. The static call graph cycle remains visible
+to archlint regardless of the guard.
+
+### File reference
+
+| File | Cycles | Description |
+|------|--------|-------------|
+| step0-behavior-clean.go | 0 | InventoryService is a leaf, no call back into order domain |
+| step1-behavior-cycle.go | 1 | InventoryService calls GetOrderDetails, cycle closes |
+| internal/service/order_service.go | part of cycle | CreateOrder, GetOrderDetails |
+| internal/service/inventory_service.go | part of cycle | CheckInventory, ReserveForOrder |
+| tests/functional_test.go | - | TestCreateOrder, TestCheckInventory_Cycle, etc. |
