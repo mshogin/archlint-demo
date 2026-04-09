@@ -2,7 +2,7 @@
 
 Realistic live demo for the archlint talk at Stachka 2026 conference.
 
-Total runtime: ~3 minutes.
+Total runtime: ~3 minutes (structural demo) + ~2 minutes (behavioral demo, optional).
 
 The story: a developer "quickly fixes" a performance bug by importing the repo
 directly from the handler, bypassing the service layer. This is the most
@@ -11,46 +11,164 @@ deadline pressure. archlint catches it the moment the file is saved.
 
 ---
 
-## Setup (before the talk, ~2 min)
+## Quick Reference
 
-### 1. Open two terminals side by side
+| Mode | Command | Use case |
+|------|---------|----------|
+| Manual | `cp ... && archlint scan` | Slides, controlled pacing |
+| Watch | `archlint watch` + `cp ...` | Live demo, reactive output |
 
-Terminal A (editor/copy-paste), Terminal B (archlint watch output).
+---
 
-### 2. Create the working file
+## Mode A: Manual (step by step cp + scan)
+
+Use this mode when you want full control over timing, e.g. during a slide deck
+where you run commands after each talking point.
+
+### Setup
 
 ```bash
+# Build archlint (if not installed)
+cd ~/projects/archlint-repo
+go build -o bin/archlint ./cmd/archlint
+export PATH=$PATH:$(pwd)/bin
+
+# Go to the demo project
+cd ~/projects/archlint-demo
+
+# Reset to clean state
 cp demo-scenario/step0-clean.go internal/handler/order.go
 ```
 
-### 3. Start archlint in watch mode (Terminal B)
+### Step 0 - Show the clean baseline
 
 ```bash
-archlint watch ./internal/handler/ --layers handler:1,service:2,repo:3
+archlint scan ./internal/ --config .archlint.yaml
 ```
 
 Expected output:
 ```
-watching ./internal/handler/ ...
-OK  handler/order.go  violations=0
+config: .archlint.yaml
+PASSED: No violations found (threshold: 0)
 ```
 
-The terminal stays open and re-runs on every file save.
+### Step 1 - Inject the "quick fix" violation
 
-### 4. Open order.go in your editor (Terminal A)
+```bash
+cp demo-scenario/step1-quick-fix.go internal/handler/order.go
+archlint scan ./internal/ --config .archlint.yaml
+```
 
-Audience should see both terminals on screen.
+Expected output:
+```
+config: .archlint.yaml
+FAILED: 1 violations found (threshold: 0)
+
+[ERROR] [layer-violation] Forbidden dependency: internal/handler (handler) -> demo/internal/repo (repository)
+  target: internal/handler
+```
+
+### Step 2 - Make it worse (second direct repo import)
+
+```bash
+cp demo-scenario/step2-worse.go internal/handler/order.go
+archlint scan ./internal/ --config .archlint.yaml
+```
+
+Expected output (same violation, now two types in the forbidden import):
+```
+config: .archlint.yaml
+FAILED: 1 violations found (threshold: 0)
+
+[ERROR] [layer-violation] Forbidden dependency: internal/handler (handler) -> demo/internal/repo (repository)
+  target: internal/handler
+```
+
+### Step 3 - Fix
+
+```bash
+cp demo-scenario/step3-fixed.go internal/handler/order.go
+archlint scan ./internal/ --config .archlint.yaml
+```
+
+Expected output:
+```
+config: .archlint.yaml
+PASSED: No violations found (threshold: 0)
+```
 
 ---
 
-## Step 0 - Clean handler (0:00)
+## Mode B: Watch mode (archlint watch + cp files)
 
-**What to do:** Show the current state of `internal/handler/order.go`.
+Use this mode for a live terminal demo where the linter reacts automatically.
+Run two terminals side by side.
 
-**What the audience sees:**
+### Terminal B - Start the watcher
+
+```bash
+cd ~/projects/archlint-demo
+archlint watch ./internal/
 ```
-OK  handler/order.go  violations=0
+
+The watcher performs an immediate scan on start and then re-scans on every `.go`
+file change. Leave this terminal visible to the audience.
+
+Initial output (clean state):
 ```
+[archlint] Watching ./internal/ ...
+[archlint] Scanning...
+[archlint] 0 errors, 18 warnings
+[archlint] Last scan: HH:MM:SS
+```
+
+Note: the watch command runs all rules (including DIP, feature-envy, etc.).
+Layer violations show as errors; SOLID warnings show as warnings.
+The scan command with `--config` only checks the rules enabled in .archlint.yaml.
+
+### Terminal A - Copy step files to inject/fix violations
+
+```bash
+# Step 0: reset clean baseline (already done above)
+cp demo-scenario/step0-clean.go internal/handler/order.go
+
+# Step 1: quick fix - handler imports repo directly
+cp demo-scenario/step1-quick-fix.go internal/handler/order.go
+
+# Step 2: making it worse - second direct repo import
+cp demo-scenario/step2-worse.go internal/handler/order.go
+
+# Step 3: fix - repo hidden behind service interface
+cp demo-scenario/step3-fixed.go internal/handler/order.go
+```
+
+After each copy, Terminal B automatically re-scans and prints the result.
+
+### Note about //go:build ignore
+
+The demo-scenario step files all begin with `//go:build ignore` so they do not
+compile as part of the `demo/internal/handler` package until copied over.
+When `cp` overwrites `internal/handler/order.go` the build tag is gone and the
+file becomes the active handler code.
+
+If you need to cat a step file without the build tag line (e.g. to pipe it
+somewhere), use:
+
+```bash
+sed '1d' demo-scenario/step1-quick-fix.go
+```
+
+This removes the first line (`//go:build ignore`) and leaves valid Go source.
+
+---
+
+## Structural Demo Walkthrough (3 min)
+
+### Step 0 - Clean handler (0:00)
+
+**What to do:** Show the current state or copy step0.
+
+**What the audience sees:** `PASSED: No violations found`
 
 **What to say (30 sec):**
 
@@ -63,7 +181,7 @@ OK  handler/order.go  violations=0
 
 ---
 
-## Step 1 - "Quick fix" (0:30)
+### Step 1 - "Quick fix" (0:30)
 
 **What to do:**
 ```bash
@@ -72,9 +190,9 @@ cp demo-scenario/step1-quick-fix.go internal/handler/order.go
 
 **What the audience sees:**
 ```
-VIOLATION  handler/order.go
-  handler -> repo  (forbidden: must go through service layer)
-  1 violation
+FAILED: 1 violations found (threshold: 0)
+
+[ERROR] [layer-violation] Forbidden dependency: internal/handler (handler) -> demo/internal/repo (repository)
 ```
 
 **What to say (45 sec):**
@@ -96,7 +214,7 @@ VIOLATION  handler/order.go
 
 ---
 
-## Step 2 - Making it worse (1:15)
+### Step 2 - Making it worse (1:15)
 
 **What to do:**
 ```bash
@@ -105,9 +223,9 @@ cp demo-scenario/step2-worse.go internal/handler/order.go
 
 **What the audience sees:**
 ```
-VIOLATION  handler/order.go
-  handler -> repo  (forbidden: must go through service layer)
-  2 violations
+FAILED: 1 violations found
+
+[ERROR] [layer-violation] Forbidden dependency: internal/handler (handler) -> demo/internal/repo (repository)
 ```
 
 **What to say (30 sec):**
@@ -124,17 +242,14 @@ VIOLATION  handler/order.go
 
 ---
 
-## Step 3 - Fixed (1:45)
+### Step 3 - Fixed (1:45)
 
 **What to do:**
 ```bash
 cp demo-scenario/step3-fixed.go internal/handler/order.go
 ```
 
-**What the audience sees:**
-```
-OK  handler/order.go  violations=0
-```
+**What the audience sees:** `PASSED: No violations found`
 
 **What to say (60 sec):**
 
@@ -157,7 +272,7 @@ OK  handler/order.go  violations=0
 
 ---
 
-## Close (2:45)
+### Close (2:45)
 
 **What to say (15 sec):**
 
@@ -165,6 +280,95 @@ OK  handler/order.go  violations=0
 > Put archlint in CI and the 'quick fix' gets a review comment before merge,
 > not six months later when the handler has four repo imports and nobody
 > remembers why."
+
+---
+
+## Behavioral Graph Demo (optional, +2 min)
+
+A second demo showing **behavioral cycles** in the call graph.
+This is a different class of problem from import layer violations:
+the cycle exists in the runtime call chain, not in the import graph.
+
+### The story
+
+Two services that "need each other": OrderService calls CheckInventory
+to check stock. CheckInventory eventually calls GetOrderDetails to validate
+order context before committing a reservation. GetOrderDetails calls back into
+CheckInventory. Each call looks reasonable in isolation. Together they form a cycle.
+
+In a monolith this is a hidden coupling. In a microservice split it becomes
+a distributed deadlock. archlint callgraph detects it statically.
+
+### Setup
+
+No file changes needed. The cycle is already in `internal/service/order_service.go`:
+
+- `CreateOrder` calls `CheckInventory`
+- `GetOrderDetails` calls `CheckInventory`
+- `CheckInventory` is resolved by archlint as external (the function is referenced but resolved at the module level)
+
+To use the explicit cycle demo files from `demo-scenario/`, remove the `//go:build ignore` tag first:
+
+```bash
+# Show the clean version (no cycle)
+sed '1d' demo-scenario/step0-behavior-clean.go > internal/service/order_service_clean.go
+
+# Show the cycle version
+sed '1d' demo-scenario/step1-behavior-cycle.go > /tmp/cycle_demo.go
+# Inspect only - do not compile as part of the service package
+```
+
+### Run the behavioral demo
+
+```bash
+# Detect the behavioral call graph from the CreateOrder entry point
+archlint callgraph ./internal --entry "internal/service.OrderService.CreateOrder" --no-puml
+```
+
+Expected output:
+```
+Analyzing code: ./internal (language: go)
+Graph built: 5 nodes, 6 edges, depth 0
+YAML: callgraphs/callgraph.yaml
+```
+
+The YAML at `callgraphs/callgraph.yaml` contains the full call chain.
+Check `stats.cycles_detected` to see the cycle count.
+
+### What the call chain looks like
+
+```
+CreateOrder
+  -> CheckInventory               (inventory domain)
+       -> ReserveForOrder         (inventory domain)
+            -> GetOrderDetails    (order domain - crosses boundary)
+                 -> CheckInventory  [CYCLE: already visited]
+```
+
+The cycle closes at `GetOrderDetails -> CheckInventory`.
+Both domains are now coupled at runtime.
+
+### What to say on stage (90 sec)
+
+> "Layer violations are visible in the import graph.
+> Behavioral cycles are invisible there - the imports look fine.
+> Both OrderService and InventoryService are in the same package.
+> No forbidden imports. archlint scan would not catch this.
+>
+> But archlint callgraph traces the actual call chain from an entry point.
+> Watch what happens when I run it against CreateOrder.
+>
+> The YAML contains the call chain. Check cycles_detected.
+>
+> GetOrderDetails calls CheckInventory. That edge has cycle: true.
+> The graph closed on itself.
+>
+> This means you cannot extract InventoryService into a separate microservice
+> without also extracting its dependency on GetOrderDetails.
+> Which means you cannot extract GetOrderDetails without CheckInventory.
+> They are locked together at runtime.
+>
+> The static import graph looked clean. The behavioral graph is not."
 
 ---
 
@@ -178,41 +382,62 @@ go build -o bin/archlint ./cmd/archlint
 export PATH=$PATH:$(pwd)/bin
 ```
 
-### Watch mode not available
+### Watch mode not available / watch hangs
 
-Use `archlint analyze` and re-run manually after each step:
+Use `archlint scan` in manual mode and re-run after each step:
 
 ```bash
-archlint analyze ./internal/handler/
+archlint scan ./internal/ --config .archlint.yaml
 ```
 
-### File not updating
+### File not updating / wrong output
 
 Make sure you are copying to the correct path:
 ```bash
 ls -la internal/handler/order.go
 ```
 
+### Step file has //go:build ignore
+
+The demo-scenario files include `//go:build ignore` to prevent them from
+compiling as part of the package. `cp` removes the build tag by overwriting the
+file. If you need to inspect a step file as plain Go source without the tag:
+
+```bash
+sed '1d' demo-scenario/step1-quick-fix.go
+```
+
 ---
 
-## File reference
+## File Reference
+
+### Structural demo files
 
 | File | Violations | Status |
 |------|------------|--------|
 | step0-clean.go | 0 | OK |
 | step1-quick-fix.go | 1 | VIOLATION (handler -> repo) |
-| step2-worse.go | 2 | VIOLATION (handler -> repo x2) |
+| step2-worse.go | 1 | VIOLATION (handler -> repo, 2 concrete types) |
 | step3-fixed.go | 0 | OK (fixed) |
 
 Import breakdown per step:
 
 **step0:** net/http, model, service
 
-**step1:** net/http, model, service, repo (VIOLATION: +repo direct)
+**step1:** net/http, model, service, repo (VIOLATION: +repo direct, OrderCache)
 
 **step2:** net/http, model, service, repo (VIOLATION: +OrderCache +UserRepo from repo)
 
 **step3:** net/http, model, service (repo hidden behind service interface)
+
+### Behavioral demo files
+
+| File | Cycles | Description |
+|------|--------|-------------|
+| step0-behavior-clean.go | 0 | InventoryService is a leaf, no call back into order domain |
+| step1-behavior-cycle.go | 1 | InventoryService calls GetOrderDetails, cycle closes |
+| internal/service/order_service.go | structural | CreateOrder, GetOrderDetails with CheckInventory calls |
+| internal/service/inventory_service.go | - | Clean version: InventoryServiceClean is a leaf |
 
 ---
 
@@ -224,141 +449,3 @@ Import breakdown per step:
 - The fix is real and fast - no magic, just moving code to the right layer
 - The archlint output names the exact forbidden dependency
 - Total steps fit in 3 minutes with room for questions
-
----
-
-## Behavioral Graph Demo
-
-A second demo showing **behavioral cycles** in the call graph.
-This is a different class of problem from import layer violations:
-the cycle exists in the runtime call chain, not in the import graph.
-
-### The story
-
-Two services that "need each other": OrderService calls InventoryService
-to check stock. InventoryService calls back into OrderService to validate
-order context before committing a reservation. Each call looks reasonable
-in isolation. Together they form a cycle.
-
-In a monolith this is a hidden coupling. In a microservice split it becomes
-a distributed deadlock. archlint callgraph detects it statically.
-
-### Setup
-
-No file changes needed - the cycle is in `internal/service/`:
-- `internal/service/order_service.go` - `CreateOrder`, `GetOrderDetails`
-- `internal/service/inventory_service.go` - `CheckInventory`, `ReserveForOrder`
-
-### Run the demo
-
-```bash
-# Detect the behavioral cycle from the CreateOrder entry point
-archlint callgraph ./internal --entry "internal/service.OrderService.CreateOrder" --no-puml
-```
-
-Expected output:
-
-```
-Analyzing code: ./internal (language: go)
-Graph built: 9 nodes, 13 edges, depth 3
-YAML: callgraphs/callgraph.yaml
-```
-
-The YAML contains:
-
-```yaml
-stats:
-  cycles_detected: 1
-
-edges:
-  - from: internal/service.GetOrderDetails
-    to: internal/service.CheckInventory
-    call_type: direct
-    line: 66
-    cycle: true
-```
-
-### What the call chain looks like
-
-```
-CreateOrder
-  -> CheckInventory               (inventory domain)
-       -> ReserveForOrder         (inventory domain)
-            -> GetOrderDetails    (order domain - crosses boundary!)
-                 -> CheckInventory  [CYCLE: already visited]
-```
-
-The cycle closes at `GetOrderDetails -> CheckInventory`.
-Both domains are now coupled at runtime.
-
-### Before (clean, step0-behavior-clean.go)
-
-```
-CreateOrder
-  -> inventory.CheckStock  (interface call, leaf)
-  -> repo.Save             (leaf)
-
-cycles_detected: 0
-```
-
-`InventoryService.CheckStock` is a leaf function: it checks a map and returns.
-It does not know about orders. The dependency is one-directional.
-
-### After (cycle, step1-behavior-cycle.go)
-
-```
-CreateOrder
-  -> checkInventoryCycle
-       -> reserveForOrderCycle
-            -> getOrderDetailsCycle
-                 -> checkInventoryCycle  [cycle: true]
-
-cycles_detected: 1
-```
-
-A developer added "validate order context before committing reservation".
-Reasonable. Cyclic.
-
-### What to say on stage (90 sec)
-
-> "Layer violations are visible in the import graph.
-> Behavioral cycles are invisible there - the imports look fine.
-> Both OrderService and InventoryService are in the same package.
-> No forbidden imports. archlint analyze would not catch this.
->
-> But archlint callgraph traces the actual call chain from an entry point.
-> Watch what happens when I run it against CreateOrder.
->
-> Nine nodes. Thirteen edges. Depth three. One cycle.
->
-> GetOrderDetails calls CheckInventory. That edge has cycle: true.
-> The graph closed on itself at depth three.
->
-> This means you cannot extract InventoryService into a separate microservice
-> without also extracting its dependency on GetOrderDetails.
-> Which means you cannot extract GetOrderDetails without CheckInventory.
-> They are locked together at runtime.
->
-> The static import graph looked clean. The behavioral graph is not."
-
-### Functional tests
-
-```bash
-go test ./tests/... -v -run TestCheckInventory_Cycle
-go test ./tests/... -v -run TestGetOrderDetails_Cycle
-go test ./tests/... -v -run TestCreateOrder
-```
-
-All tests pass. The depth guard (`depth > 2 -> return true`) prevents
-runtime infinite recursion. The static call graph cycle remains visible
-to archlint regardless of the guard.
-
-### File reference
-
-| File | Cycles | Description |
-|------|--------|-------------|
-| step0-behavior-clean.go | 0 | InventoryService is a leaf, no call back into order domain |
-| step1-behavior-cycle.go | 1 | InventoryService calls GetOrderDetails, cycle closes |
-| internal/service/order_service.go | part of cycle | CreateOrder, GetOrderDetails |
-| internal/service/inventory_service.go | part of cycle | CheckInventory, ReserveForOrder |
-| tests/functional_test.go | - | TestCreateOrder, TestCheckInventory_Cycle, etc. |
