@@ -4,41 +4,37 @@
 ARCHLINT ?= ../archlint-repo/bin/archlint
 CONFIG = --config .archlint.yaml
 
+SHELL := /bin/bash -x
+
 # Remove //go:build ignore and copy to target
 define copy_step
-	@sed '1d' demo-scenario/$(1) > $(2)
-	@echo "Copied: $(1) -> $(2)"
+	sed '1d' demo-scenario/$(1) > $(2)
 endef
 
 ## Step 0: Clean state (no violations, no cycles)
 step0:
 	$(call copy_step,step0-clean.go,internal/handler/order.go)
 	$(call copy_step,step0-behavior-clean.go,internal/service/inventory_service.go)
-	@echo ""
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
 ## Step 1: Introduce layer violation (handler imports repo)
 step1:
 	$(call copy_step,step1-quick-fix.go,internal/handler/order.go)
-	@echo ""
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
 ## Step 2: Introduce behavioral cycle
 step2:
 	$(call copy_step,step1-behavior-cycle.go,internal/service/inventory_service.go)
-	@echo ""
 	$(ARCHLINT) callgraph ./internal --entry "internal/service.OrderServiceWithCycle.CreateOrderWithCycle" --no-puml
 
 ## Step 3: Fix layer violation
 step3:
 	$(call copy_step,step3-fixed.go,internal/handler/order.go)
-	@echo ""
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
 ## Step 4: Fix behavioral cycle
 step4:
 	$(call copy_step,step0-behavior-clean.go,internal/service/inventory_service.go)
-	@echo ""
 	$(ARCHLINT) callgraph ./internal --entry "internal/service.OrderService.CreateOrder" --no-puml
 
 ## Collect full architecture graph
