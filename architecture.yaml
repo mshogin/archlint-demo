@@ -1,0 +1,995 @@
+components:
+  - id: internal/handler
+    title: handler
+    entity: package
+  - id: internal/model
+    title: model
+    entity: package
+  - id: internal/repo
+    title: repo
+    entity: package
+  - id: internal/service
+    title: service
+    entity: package
+  - id: internal/tracking
+    title: tracking
+    entity: package
+  - id: cmd
+    title: main
+    entity: package
+  - id: demo-scenario
+    title: handler
+    entity: package
+  - id: internal/config
+    title: config
+    entity: package
+  - id: demo-scenario.OrderMetrics
+    title: OrderMetrics
+    entity: interface
+  - id: internal/repo.OrderRepo
+    title: OrderRepo
+    entity: struct
+  - id: internal/service.UserRepository
+    title: UserRepository
+    entity: interface
+  - id: internal/tracking.RequestTracker
+    title: RequestTracker
+    entity: struct
+  - id: demo-scenario.InventoryChecker
+    title: InventoryChecker
+    entity: interface
+  - id: demo-scenario.OrderServiceWithCycle
+    title: OrderServiceWithCycle
+    entity: struct
+  - id: internal/config.AppConfig
+    title: AppConfig
+    entity: struct
+  - id: internal/config.Configurator
+    title: Configurator
+    entity: interface
+  - id: internal/handler.UserHandler
+    title: UserHandler
+    entity: struct
+  - id: internal/model.CreateOrderRequest
+    title: CreateOrderRequest
+    entity: struct
+  - id: internal/repo.OrderCache
+    title: OrderCache
+    entity: struct
+  - id: internal/model.OrderItem
+    title: OrderItem
+    entity: struct
+  - id: internal/repo.UserRepo
+    title: UserRepo
+    entity: struct
+  - id: internal/service.OrderCache
+    title: OrderCache
+    entity: interface
+  - id: internal/service.OrderService
+    title: OrderService
+    entity: struct
+  - id: internal/service.UserService
+    title: UserService
+    entity: struct
+  - id: internal/model.User
+    title: User
+    entity: struct
+  - id: demo-scenario.orderCacheEntry
+    title: orderCacheEntry
+    entity: struct
+  - id: internal/config.DefaultConfig
+    title: DefaultConfig
+    entity: struct
+  - id: internal/handler.OrderHandler
+    title: OrderHandler
+    entity: struct
+  - id: internal/model.Order
+    title: Order
+    entity: struct
+  - id: internal/repo.CachedRepo
+    title: CachedRepo
+    entity: struct
+  - id: internal/service.InventoryService
+    title: InventoryService
+    entity: struct
+  - id: internal/service.OrderRepository
+    title: OrderRepository
+    entity: interface
+  - id: demo-scenario.OrderServiceClean
+    title: OrderServiceClean
+    entity: struct
+  - id: demo-scenario.InventoryServiceClean
+    title: InventoryServiceClean
+    entity: struct
+  - id: demo-scenario.OrderHandler
+    title: OrderHandler
+    entity: struct
+  - id: demo-scenario.OrderCache
+    title: OrderCache
+    entity: interface
+  - id: internal/service.NewOrderService
+    title: NewOrderService
+    entity: function
+  - id: internal/handler.NewUserHandler
+    title: NewUserHandler
+    entity: function
+  - id: internal/handler.NewOrderHandler
+    title: NewOrderHandler
+    entity: function
+  - id: internal/repo.NewUserRepo
+    title: NewUserRepo
+    entity: function
+  - id: internal/service.GetOrderDetails
+    title: GetOrderDetails
+    entity: function
+  - id: internal/tracking.NewRequestTracker
+    title: NewRequestTracker
+    entity: function
+  - id: cmd.main
+    title: main
+    entity: function
+  - id: demo-scenario.pathParam
+    title: pathParam
+    entity: function
+  - id: demo-scenario.getOrderDetailsCycle
+    title: getOrderDetailsCycle
+    entity: function
+  - id: demo-scenario.reserveForOrderCycle
+    title: reserveForOrderCycle
+    entity: function
+  - id: internal/config.NewDefaultConfig
+    title: NewDefaultConfig
+    entity: function
+  - id: internal/repo.NewOrderRepo
+    title: NewOrderRepo
+    entity: function
+  - id: internal/service.NewUserService
+    title: NewUserService
+    entity: function
+  - id: demo-scenario.decodeJSON
+    title: decodeJSON
+    entity: function
+  - id: demo-scenario.writeJSON
+    title: writeJSON
+    entity: function
+  - id: internal/service.NewInventoryService
+    title: NewInventoryService
+    entity: function
+  - id: internal/service.CheckInventory
+    title: CheckInventory
+    entity: function
+  - id: demo-scenario.NewOrderServiceClean
+    title: NewOrderServiceClean
+    entity: function
+  - id: demo-scenario.NewOrderHandler
+    title: NewOrderHandler
+    entity: function
+  - id: demo-scenario.NewOrderServiceWithCycle
+    title: NewOrderServiceWithCycle
+    entity: function
+  - id: demo-scenario.checkInventoryCycle
+    title: checkInventoryCycle
+    entity: function
+  - id: internal/repo.NewCachedRepo
+    title: NewCachedRepo
+    entity: function
+  - id: internal/repo.NewOrderCache
+    title: NewOrderCache
+    entity: function
+  - id: internal/service.ReserveForOrder
+    title: ReserveForOrder
+    entity: function
+  - id: internal/config.DefaultConfig.GetLogLevel
+    title: GetLogLevel
+    entity: method
+  - id: internal/handler.UserHandler.writeError
+    title: writeError
+    entity: method
+  - id: internal/model.User.FormatName
+    title: FormatName
+    entity: method
+  - id: internal/model.User.FormatPhone
+    title: FormatPhone
+    entity: method
+  - id: internal/model.User.Age
+    title: Age
+    entity: method
+  - id: internal/config.DefaultConfig.GetTLSCert
+    title: GetTLSCert
+    entity: method
+  - id: internal/config.DefaultConfig.GetPort
+    title: GetPort
+    entity: method
+  - id: internal/handler.UserHandler.CreateUser
+    title: CreateUser
+    entity: method
+  - id: internal/model.User.SetEmail
+    title: SetEmail
+    entity: method
+  - id: internal/model.User.Deactivate
+    title: Deactivate
+    entity: method
+  - id: internal/service.UserService.Register
+    title: Register
+    entity: method
+  - id: internal/service.UserService.FindByID
+    title: FindByID
+    entity: method
+  - id: internal/tracking.RequestTracker.Record
+    title: Record
+    entity: method
+  - id: internal/handler.OrderHandler.CreateOrder
+    title: CreateOrder
+    entity: method
+  - id: internal/repo.OrderRepo.FindByID
+    title: FindByID
+    entity: method
+  - id: internal/service.InventoryService.Reserve
+    title: Reserve
+    entity: method
+  - id: internal/service.OrderService.Get
+    title: Get
+    entity: method
+  - id: internal/config.DefaultConfig.GetCacheURL
+    title: GetCacheURL
+    entity: method
+  - id: demo-scenario.InventoryServiceClean.CheckStock
+    title: CheckStock
+    entity: method
+  - id: internal/config.DefaultConfig.GetMaxConnections
+    title: GetMaxConnections
+    entity: method
+  - id: internal/handler.UserHandler.GetUser
+    title: GetUser
+    entity: method
+  - id: internal/model.User.IsActive
+    title: IsActive
+    entity: method
+  - id: internal/model.User.String
+    title: String
+    entity: method
+  - id: internal/repo.CachedRepo.GetCached
+    title: GetCached
+    entity: method
+  - id: internal/repo.UserRepo.Save
+    title: Save
+    entity: method
+  - id: demo-scenario.OrderServiceClean.CreateOrder
+    title: CreateOrder
+    entity: method
+  - id: internal/config.DefaultConfig.GetDSN
+    title: GetDSN
+    entity: method
+  - id: internal/handler.UserHandler.Tracker
+    title: Tracker
+    entity: method
+  - id: internal/model.User.GetName
+    title: GetName
+    entity: method
+  - id: internal/model.User.GetEmail
+    title: GetEmail
+    entity: method
+  - id: internal/model.User.IsStale
+    title: IsStale
+    entity: method
+  - id: internal/model.User.Activate
+    title: Activate
+    entity: method
+  - id: internal/repo.OrderRepo.Save
+    title: Save
+    entity: method
+  - id: demo-scenario.OrderHandler.GetOrder
+    title: GetOrder
+    entity: method
+  - id: demo-scenario.OrderServiceWithCycle.CreateOrderWithCycle
+    title: CreateOrderWithCycle
+    entity: method
+  - id: internal/config.DefaultConfig.GetHost
+    title: GetHost
+    entity: method
+  - id: internal/config.DefaultConfig.GetTimeout
+    title: GetTimeout
+    entity: method
+  - id: internal/model.User.IsAdmin
+    title: IsAdmin
+    entity: method
+  - id: internal/model.User.Validate
+    title: Validate
+    entity: method
+  - id: internal/repo.OrderCache.Get
+    title: Get
+    entity: method
+  - id: internal/repo.OrderCache.Invalidate
+    title: Invalidate
+    entity: method
+  - id: internal/model.User.FormatEmail
+    title: FormatEmail
+    entity: method
+  - id: internal/model.User.Touch
+    title: Touch
+    entity: method
+  - id: internal/model.User.UpdateScore
+    title: UpdateScore
+    entity: method
+  - id: internal/repo.UserRepo.Delete
+    title: Delete
+    entity: method
+  - id: internal/repo.UserRepo.Count
+    title: Count
+    entity: method
+  - id: internal/service.OrderService.Create
+    title: Create
+    entity: method
+  - id: internal/service.OrderService.GetWithCache
+    title: GetWithCache
+    entity: method
+  - id: internal/service.OrderService.CreateOrder
+    title: CreateOrder
+    entity: method
+  - id: demo-scenario.OrderHandler.CreateOrder
+    title: CreateOrder
+    entity: method
+  - id: internal/handler.OrderHandler.GetOrder
+    title: GetOrder
+    entity: method
+  - id: internal/model.User.GetID
+    title: GetID
+    entity: method
+  - id: internal/repo.OrderCache.Set
+    title: Set
+    entity: method
+  - id: internal/repo.UserRepo.FindByID
+    title: FindByID
+    entity: method
+  - id: internal/tracking.RequestTracker.LastRequestID
+    title: LastRequestID
+    entity: method
+  - id: demo/internal/config
+    title: config
+    entity: external
+  - id: demo/internal/handler
+    title: handler
+    entity: external
+  - id: demo/internal/repo
+    title: repo
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/repo
+    title: repo
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/repo
+    title: repo
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/config
+    title: config
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/repo
+    title: repo
+    entity: external
+  - id: demo/internal/tracking
+    title: tracking
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/service
+    title: service
+    entity: external
+  - id: demo/internal/tracking
+    title: tracking
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+  - id: demo/internal/model
+    title: model
+    entity: external
+links:
+  - from: demo-scenario
+    to: demo-scenario.OrderMetrics
+    type: contains
+  - from: internal/repo
+    to: internal/repo.OrderRepo
+    type: contains
+  - from: internal/service
+    to: internal/service.UserRepository
+    type: contains
+  - from: internal/tracking
+    to: internal/tracking.RequestTracker
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.InventoryChecker
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.OrderServiceWithCycle
+    type: contains
+  - from: internal/config
+    to: internal/config.AppConfig
+    type: contains
+  - from: internal/config
+    to: internal/config.Configurator
+    type: contains
+  - from: internal/handler
+    to: internal/handler.UserHandler
+    type: contains
+  - from: internal/model
+    to: internal/model.CreateOrderRequest
+    type: contains
+  - from: internal/repo
+    to: internal/repo.OrderCache
+    type: contains
+  - from: internal/model
+    to: internal/model.OrderItem
+    type: contains
+  - from: internal/repo
+    to: internal/repo.UserRepo
+    type: contains
+  - from: internal/service
+    to: internal/service.OrderCache
+    type: contains
+  - from: internal/service
+    to: internal/service.OrderService
+    type: contains
+  - from: internal/service
+    to: internal/service.UserService
+    type: contains
+  - from: internal/model
+    to: internal/model.User
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.orderCacheEntry
+    type: contains
+  - from: internal/config
+    to: internal/config.DefaultConfig
+    type: contains
+  - from: internal/handler
+    to: internal/handler.OrderHandler
+    type: contains
+  - from: internal/model
+    to: internal/model.Order
+    type: contains
+  - from: internal/repo
+    to: internal/repo.CachedRepo
+    type: contains
+  - from: internal/service
+    to: internal/service.InventoryService
+    type: contains
+  - from: internal/service
+    to: internal/service.OrderRepository
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.OrderServiceClean
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.InventoryServiceClean
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.OrderHandler
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.OrderCache
+    type: contains
+  - from: internal/service
+    to: internal/service.NewOrderService
+    type: contains
+  - from: internal/handler
+    to: internal/handler.NewUserHandler
+    type: contains
+  - from: internal/handler
+    to: internal/handler.NewOrderHandler
+    type: contains
+  - from: internal/repo
+    to: internal/repo.NewUserRepo
+    type: contains
+  - from: internal/service
+    to: internal/service.GetOrderDetails
+    type: contains
+  - from: internal/tracking
+    to: internal/tracking.NewRequestTracker
+    type: contains
+  - from: cmd
+    to: cmd.main
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.pathParam
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.getOrderDetailsCycle
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.reserveForOrderCycle
+    type: contains
+  - from: internal/config
+    to: internal/config.NewDefaultConfig
+    type: contains
+  - from: internal/repo
+    to: internal/repo.NewOrderRepo
+    type: contains
+  - from: internal/service
+    to: internal/service.NewUserService
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.decodeJSON
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.writeJSON
+    type: contains
+  - from: internal/service
+    to: internal/service.NewInventoryService
+    type: contains
+  - from: internal/service
+    to: internal/service.CheckInventory
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.NewOrderServiceClean
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.NewOrderHandler
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.NewOrderServiceWithCycle
+    type: contains
+  - from: demo-scenario
+    to: demo-scenario.checkInventoryCycle
+    type: contains
+  - from: internal/repo
+    to: internal/repo.NewCachedRepo
+    type: contains
+  - from: internal/repo
+    to: internal/repo.NewOrderCache
+    type: contains
+  - from: internal/service
+    to: internal/service.ReserveForOrder
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetLogLevel
+    type: contains
+  - from: internal/handler.UserHandler
+    to: internal/handler.UserHandler.writeError
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.FormatName
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.FormatPhone
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.Age
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetTLSCert
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetPort
+    type: contains
+  - from: internal/handler.UserHandler
+    to: internal/handler.UserHandler.CreateUser
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.SetEmail
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.Deactivate
+    type: contains
+  - from: internal/service.UserService
+    to: internal/service.UserService.Register
+    type: contains
+  - from: internal/service.UserService
+    to: internal/service.UserService.FindByID
+    type: contains
+  - from: internal/tracking.RequestTracker
+    to: internal/tracking.RequestTracker.Record
+    type: contains
+  - from: internal/handler.OrderHandler
+    to: internal/handler.OrderHandler.CreateOrder
+    type: contains
+  - from: internal/repo.OrderRepo
+    to: internal/repo.OrderRepo.FindByID
+    type: contains
+  - from: internal/service.InventoryService
+    to: internal/service.InventoryService.Reserve
+    type: contains
+  - from: internal/service.OrderService
+    to: internal/service.OrderService.Get
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetCacheURL
+    type: contains
+  - from: demo-scenario.InventoryServiceClean
+    to: demo-scenario.InventoryServiceClean.CheckStock
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetMaxConnections
+    type: contains
+  - from: internal/handler.UserHandler
+    to: internal/handler.UserHandler.GetUser
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.IsActive
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.String
+    type: contains
+  - from: internal/repo.CachedRepo
+    to: internal/repo.CachedRepo.GetCached
+    type: contains
+  - from: internal/repo.UserRepo
+    to: internal/repo.UserRepo.Save
+    type: contains
+  - from: demo-scenario.OrderServiceClean
+    to: demo-scenario.OrderServiceClean.CreateOrder
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetDSN
+    type: contains
+  - from: internal/handler.UserHandler
+    to: internal/handler.UserHandler.Tracker
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.GetName
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.GetEmail
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.IsStale
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.Activate
+    type: contains
+  - from: internal/repo.OrderRepo
+    to: internal/repo.OrderRepo.Save
+    type: contains
+  - from: demo-scenario.OrderHandler
+    to: demo-scenario.OrderHandler.GetOrder
+    type: contains
+  - from: demo-scenario.OrderServiceWithCycle
+    to: demo-scenario.OrderServiceWithCycle.CreateOrderWithCycle
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetHost
+    type: contains
+  - from: internal/config.DefaultConfig
+    to: internal/config.DefaultConfig.GetTimeout
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.IsAdmin
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.Validate
+    type: contains
+  - from: internal/repo.OrderCache
+    to: internal/repo.OrderCache.Get
+    type: contains
+  - from: internal/repo.OrderCache
+    to: internal/repo.OrderCache.Invalidate
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.FormatEmail
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.Touch
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.UpdateScore
+    type: contains
+  - from: internal/repo.UserRepo
+    to: internal/repo.UserRepo.Delete
+    type: contains
+  - from: internal/repo.UserRepo
+    to: internal/repo.UserRepo.Count
+    type: contains
+  - from: internal/service.OrderService
+    to: internal/service.OrderService.Create
+    type: contains
+  - from: internal/service.OrderService
+    to: internal/service.OrderService.GetWithCache
+    type: contains
+  - from: internal/service.OrderService
+    to: internal/service.OrderService.CreateOrder
+    type: contains
+  - from: demo-scenario.OrderHandler
+    to: demo-scenario.OrderHandler.CreateOrder
+    type: contains
+  - from: internal/handler.OrderHandler
+    to: internal/handler.OrderHandler.GetOrder
+    type: contains
+  - from: internal/model.User
+    to: internal/model.User.GetID
+    type: contains
+  - from: internal/repo.OrderCache
+    to: internal/repo.OrderCache.Set
+    type: contains
+  - from: internal/repo.UserRepo
+    to: internal/repo.UserRepo.FindByID
+    type: contains
+  - from: internal/tracking.RequestTracker
+    to: internal/tracking.RequestTracker.LastRequestID
+    type: contains
+  - from: cmd
+    to: demo/internal/config
+    type: import
+  - from: cmd
+    to: demo/internal/handler
+    type: import
+  - from: cmd
+    to: demo/internal/repo
+    type: import
+  - from: cmd
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/repo
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/repo
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: demo-scenario
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario
+    to: demo/internal/service
+    type: import
+  - from: internal/handler
+    to: demo/internal/config
+    type: import
+  - from: internal/handler
+    to: demo/internal/model
+    type: import
+  - from: internal/handler
+    to: demo/internal/repo
+    type: import
+  - from: internal/handler
+    to: demo/internal/tracking
+    type: import
+  - from: internal/handler
+    to: demo/internal/model
+    type: import
+  - from: internal/handler
+    to: demo/internal/service
+    type: import
+  - from: internal/repo
+    to: demo/internal/tracking
+    type: import
+  - from: internal/repo
+    to: demo/internal/model
+    type: import
+  - from: internal/repo
+    to: demo/internal/model
+    type: import
+  - from: internal/service
+    to: demo/internal/model
+    type: import
+  - from: internal/service
+    to: demo/internal/model
+    type: import
+  - from: internal/service
+    to: demo/internal/model
+    type: import
+  - from: internal/service
+    to: demo/internal/model
+    type: import
+  - from: demo-scenario.checkInventoryCycle
+    to: demo-scenario.reserveForOrderCycle
+    type: calls
+  - from: internal/service.ReserveForOrder
+    to: internal/service.GetOrderDetails
+    type: calls
+  - from: internal/service.GetOrderDetails
+    to: internal/service.CheckInventory
+    type: calls
+  - from: demo-scenario.getOrderDetailsCycle
+    to: demo-scenario.checkInventoryCycle
+    type: calls
+  - from: demo-scenario.reserveForOrderCycle
+    to: demo-scenario.getOrderDetailsCycle
+    type: calls
+  - from: internal/service.CheckInventory
+    to: internal/service.ReserveForOrder
+    type: calls
+  - from: demo-scenario.OrderHandler.GetOrder
+    to: demo-scenario.pathParam
+    type: calls
+  - from: demo-scenario.OrderHandler.GetOrder
+    to: demo-scenario.writeJSON
+    type: calls
+  - from: demo-scenario.OrderHandler.GetOrder
+    to: demo-scenario.writeJSON
+    type: calls
+  - from: demo-scenario.OrderServiceWithCycle.CreateOrderWithCycle
+    to: demo-scenario.checkInventoryCycle
+    type: calls
+  - from: internal/service.OrderService.CreateOrder
+    to: internal/service.CheckInventory
+    type: calls
+  - from: demo-scenario.OrderHandler.CreateOrder
+    to: demo-scenario.decodeJSON
+    type: calls
+  - from: demo-scenario.OrderHandler.CreateOrder
+    to: demo-scenario.writeJSON
+    type: calls
+  - from: internal/model.CreateOrderRequest
+    to: internal/model.OrderItem
+    type: uses
+  - from: internal/repo.OrderCache
+    to: internal/model.Order
+    type: uses
+  - from: internal/repo.UserRepo
+    to: internal/model.User
+    type: uses
+  - from: internal/service.OrderService
+    to: internal/service.OrderRepository
+    type: uses
+  - from: internal/service.OrderService
+    to: internal/service.OrderCache
+    type: uses
+  - from: internal/service.UserService
+    to: internal/service.UserRepository
+    type: uses
+  - from: demo-scenario.orderCacheEntry
+    to: internal/model.Order
+    type: uses
+  - from: internal/config.DefaultConfig
+    to: internal/config.AppConfig
+    type: uses
+  - from: internal/handler.OrderHandler
+    to: internal/service.OrderService
+    type: uses
+  - from: internal/model.Order
+    to: internal/model.OrderItem
+    type: uses
+  - from: internal/repo.CachedRepo
+    to: internal/repo.UserRepo
+    type: uses
+  - from: internal/repo.CachedRepo
+    to: internal/tracking.RequestTracker
+    type: uses
+  - from: demo-scenario.OrderServiceClean
+    to: internal/service.OrderRepository
+    type: uses
+  - from: demo-scenario.OrderServiceClean
+    to: demo-scenario.InventoryChecker
+    type: uses
+  - from: demo-scenario.OrderHandler
+    to: internal/service.OrderService
+    type: uses
+  - from: demo-scenario.OrderHandler
+    to: demo-scenario.OrderCache
+    type: uses
+  - from: demo-scenario.OrderHandler
+    to: demo-scenario.OrderMetrics
+    type: uses
+  - from: internal/repo.OrderRepo
+    to: internal/model.Order
+    type: uses
+  - from: demo-scenario.OrderServiceWithCycle
+    to: internal/service.OrderRepository
+    type: uses
+  - from: internal/handler.UserHandler
+    to: internal/repo.UserRepo
+    type: uses
+  - from: internal/handler.UserHandler
+    to: internal/config.Configurator
+    type: uses
+  - from: internal/handler.UserHandler
+    to: internal/tracking.RequestTracker
+    type: uses

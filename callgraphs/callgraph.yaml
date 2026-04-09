@@ -13,35 +13,9 @@ nodes:
     function: fmt.Errorf
     type: external
     depth: 1
-  - id: internal/service.len
-    package: ""
-    function: internal/service.len
-    type: external
-    depth: 1
   - id: internal/service.CheckInventory
-    package: internal/service
-    function: CheckInventory
-    type: function
-    file: internal/service/inventory_service.go
-    line: 50
-    depth: 1
-  - id: internal/service.ReserveForOrder
-    package: internal/service
-    function: ReserveForOrder
-    type: function
-    file: internal/service/inventory_service.go
-    line: 71
-    depth: 2
-  - id: internal/service.GetOrderDetails
-    package: internal/service
-    function: GetOrderDetails
-    type: function
-    file: internal/service/order_service.go
-    line: 58
-    depth: 3
-  - id: internal/service.float64
     package: ""
-    function: internal/service.float64
+    function: internal/service.CheckInventory
     type: external
     depth: 1
   - id: fmt.Sprintf
@@ -60,10 +34,6 @@ edges:
     call_type: direct
     line: 20
   - from: internal/service.OrderService.CreateOrder
-    to: internal/service.len
-    call_type: direct
-    line: 22
-  - from: internal/service.OrderService.CreateOrder
     to: fmt.Errorf
     call_type: direct
     line: 23
@@ -71,35 +41,10 @@ edges:
     to: internal/service.CheckInventory
     call_type: direct
     line: 28
-  - from: internal/service.CheckInventory
-    to: internal/service.len
-    call_type: direct
-    line: 56
-  - from: internal/service.CheckInventory
-    to: internal/service.ReserveForOrder
-    call_type: direct
-    line: 62
-  - from: internal/service.ReserveForOrder
-    to: internal/service.len
-    call_type: direct
-    line: 72
-  - from: internal/service.ReserveForOrder
-    to: internal/service.GetOrderDetails
-    call_type: direct
-    line: 78
-  - from: internal/service.GetOrderDetails
-    to: internal/service.CheckInventory
-    call_type: direct
-    line: 66
-    cycle: true
   - from: internal/service.OrderService.CreateOrder
     to: fmt.Errorf
     call_type: direct
     line: 29
-  - from: internal/service.OrderService.CreateOrder
-    to: internal/service.float64
-    call_type: direct
-    line: 34
   - from: internal/service.OrderService.CreateOrder
     to: fmt.Sprintf
     call_type: direct
@@ -109,12 +54,12 @@ edges:
     call_type: direct
     line: 45
 max_depth: 10
-actual_depth: 3
+actual_depth: 0
 stats:
-  total_nodes: 9
-  total_edges: 13
-  max_depth_reached: 3
+  total_nodes: 5
+  total_edges: 6
+  max_depth_reached: 0
   interface_calls: 0
   goroutine_calls: 0
-  cycles_detected: 1
-  unresolved_calls: 9
+  cycles_detected: 0
+  unresolved_calls: 6
