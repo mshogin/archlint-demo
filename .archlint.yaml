@@ -1,0 +1,38 @@
+# archlint demo project config
+rules:
+  fan_out:
+    enabled: true
+    threshold: 10
+    level: taboo
+  cycles:
+    enabled: true
+    level: taboo
+  dip:
+    enabled: false
+  isp:
+    enabled: false
+  feature_envy:
+    enabled: false
+  god_class:
+    enabled: false
+  srp:
+    enabled: false
+  hub_node:
+    enabled: false
+  coupling:
+    threshold: 20
+
+layers:
+  - name: handler
+    paths: [internal/handler]
+  - name: service
+    paths: [internal/service]
+  - name: repository
+    paths: [internal/repo]
+  - name: model
+    paths: [internal/model]
+
+allowed_dependencies:
+  handler: [service, model]
+  service: [repository, model]
+  repository: [model]
