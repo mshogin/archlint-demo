@@ -17,9 +17,14 @@ step0:
 	$(call copy_step,step0-behavior-clean.go,internal/service/inventory_service.go)
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
-## Step 1: Introduce layer violation (handler imports repo)
+## Step 1: Introduce layer violation (handler imports repo, with comments)
 step1:
 	$(call copy_step,step1-quick-fix.go,internal/handler/order.go)
+	$(ARCHLINT) scan ./internal/ $(CONFIG)
+
+## Step 1.1: Introduce layer violation (clean code, no comments - good for diff demos)
+step1.1:
+	$(call copy_step,step1.1-violation.go,internal/handler/order.go)
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
 ## Step 2: Introduce behavioral cycle
