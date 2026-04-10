@@ -25,7 +25,6 @@ step1:
 ## Step 1.1: Introduce layer violation + handler test (clean diff, good for demos)
 step1.1:
 	$(call copy_step,step1.1-violation.go,internal/handler/order.go)
-	$(call copy_step,step1-behavior-cycle.go,internal/service/inventory_service.go)
 	cp demo-scenario/step1.1-handler-test.go tests/handler_cache_test.go
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
