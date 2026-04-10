@@ -2,6 +2,9 @@
 # arch-guardian.sh
 #
 # Watches ./internal/ for file changes via archlint watch.
+# Runs two checks on every change:
+#   1. archlint scan   - layer violations (structural)
+#   2. archlint callgraph - behavioral cycles (if callgraph-entries.yaml exists)
 # On violation: writes to VIOLATIONS_FILE.
 # On fix detected: clears VIOLATIONS_FILE.
 # Claude Code reads the file and fixes violations.
@@ -41,12 +44,30 @@ while true; do
 
     if [ "$CURRENT_SIZE" -gt "$LAST_SIZE" ]; then
         LAST_SIZE=$CURRENT_SIZE
-        result=$($ARCHLINT scan "$DIR" --config "$CONFIG" 2>&1) || true
         ts=$(date '+%H:%M:%S')
+        violations=""
 
-        if echo "$result" | grep -q "FAILED"; then
+        # Check 1: layer violations (structural)
+        scan_result=$($ARCHLINT scan "$DIR" --config "$CONFIG" 2>&1) || true
+        if echo "$scan_result" | grep -q "FAILED"; then
+            violations="$scan_result"
+        fi
+
+        # Check 2: behavioral cycles (only if callgraph-entries.yaml exists)
+        if [ -f "callgraph-entries.yaml" ] && [ -z "$violations" ]; then
+            while IFS= read -r entry; do
+                [[ "$entry" =~ ^#.*$ || -z "$entry" ]] && continue
+                $ARCHLINT callgraph "$DIR" --entry "$entry" --no-puml > /dev/null 2>&1 || true
+                if [ -f "callgraphs/callgraph.yaml" ] && grep -q "cycles_detected: [1-9]" callgraphs/callgraph.yaml; then
+                    violations=$(cat callgraphs/callgraph.yaml)
+                    break
+                fi
+            done < <(grep -v '^#' callgraph-entries.yaml | grep -v '^entries:' | sed 's/^[[:space:]]*-[[:space:]]*//')
+        fi
+
+        if [ -n "$violations" ]; then
             echo "[$ts] VIOLATION -> $VIOLATIONS_FILE"
-            echo "$result" > "$VIOLATIONS_FILE"
+            echo "$violations" > "$VIOLATIONS_FILE"
         else
             echo "[$ts] OK"
             > "$VIOLATIONS_FILE"

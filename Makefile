@@ -28,6 +28,13 @@ step1.1:
 	cp demo-scenario/step1.1-handler-test.go tests/handler_cache_test.go
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
+## Step 2.1: Introduce behavioral cycle (guardian-detectable via callgraph)
+step2.1:
+	$(call copy_step,step2.1-fulfillment-cycle.go,internal/service/fulfillment.go)
+	cp demo-scenario/step2.1-fulfillment-test.go tests/fulfillment_test.go
+	cp demo-scenario/step2.1-callgraph-entries.yaml callgraph-entries.yaml
+	$(ARCHLINT) callgraph ./internal --entry "internal/service.FulfillmentService.FulfillOrder" --no-puml
+
 ## Step 2: Introduce behavioral cycle
 step2:
 	$(call copy_step,step1-behavior-cycle.go,internal/service/inventory_service.go)
@@ -66,6 +73,8 @@ demo: step0 step1 step3 step2 step4
 
 ## Reset to clean state
 reset: step0
-	rm -f tests/handler_cache_test.go
+	rm -f tests/handler_cache_test.go tests/fulfillment_test.go
+	rm -f internal/service/fulfillment.go
+	rm -f callgraph-entries.yaml
 
-.PHONY: step0 step1 step2 step3 step4 collect watch guardian demo reset
+.PHONY: step0 step1 step1.1 step2 step2.1 step3 step4 collect watch test guardian demo reset
