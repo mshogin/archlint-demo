@@ -70,25 +70,3 @@ func (s *OrderService) Create(userID string, items []model.OrderItem) (*model.Or
 func (s *OrderService) Get(id string) (*model.Order, error) {
 	return s.repo.FindByID(id)
 }
-
-// GetWithCache retrieves an order by ID, checking cache first.
-// Cache logic lives here - not in the handler. This is the correct pattern.
-// Handler calls GetWithCache; it does not know about the cache at all.
-func (s *OrderService) GetWithCache(id string) (*model.Order, error) {
-	if s.cache != nil {
-		if o, ok := s.cache.Get(id); ok {
-			return o, nil
-		}
-	}
-
-	o, err := s.repo.FindByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if s.cache != nil {
-		s.cache.Set(o)
-	}
-
-	return o, nil
-}
