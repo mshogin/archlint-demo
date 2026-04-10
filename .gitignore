@@ -8,3 +8,4 @@ callgraphs/
 tests/handler_cache_test.go
 tests/fulfillment_test.go
 callgraph-entries.yaml
+internal/service/fulfillment.go
