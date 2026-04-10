@@ -74,7 +74,7 @@ demo: step0 step1 step3 step2 step4
 ## Reset to clean state
 reset: step0
 	rm -f tests/handler_cache_test.go tests/fulfillment_test.go
-	rm -f internal/service/fulfillment.go
+	$(call copy_step,step0-fulfillment-clean.go,internal/service/fulfillment.go)
 	rm -f callgraph-entries.yaml
 
 .PHONY: step0 step1 step1.1 step2 step2.1 step3 step4 collect watch test guardian demo reset
