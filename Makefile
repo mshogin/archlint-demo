@@ -22,9 +22,11 @@ step1:
 	$(call copy_step,step1-quick-fix.go,internal/handler/order.go)
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
-## Step 1.1: Introduce layer violation (clean code, no comments - good for diff demos)
+## Step 1.1: Introduce layer violation + handler test (clean diff, good for demos)
 step1.1:
 	$(call copy_step,step1.1-violation.go,internal/handler/order.go)
+	$(call copy_step,step1-behavior-cycle.go,internal/service/inventory_service.go)
+	cp demo-scenario/step1.1-handler-test.go tests/handler_cache_test.go
 	$(ARCHLINT) scan ./internal/ $(CONFIG)
 
 ## Step 2: Introduce behavioral cycle
@@ -50,6 +52,10 @@ collect:
 watch:
 	$(ARCHLINT) watch ./internal/
 
+## Run tests
+test:
+	go test ./tests/...
+
 ## Architecture Guardian - watch + auto-fix violations via Claude (Ctrl+C to stop)
 guardian:
 	@bash scripts/arch-guardian.sh
@@ -61,5 +67,6 @@ demo: step0 step1 step3 step2 step4
 
 ## Reset to clean state
 reset: step0
+	rm -f tests/handler_cache_test.go
 
 .PHONY: step0 step1 step2 step3 step4 collect watch guardian demo reset

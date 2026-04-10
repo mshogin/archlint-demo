@@ -113,3 +113,10 @@ func reserveForOrderCycle(orderID string, items []model.OrderItem, depth int) bo
 	_, valid := getOrderDetailsCycle(orderID, depth+1) // <- crosses into order domain
 	return valid
 }
+
+// CheckInventory is the exported entry point called by OrderService.CreateOrder.
+// Cycle version: delegates to checkInventoryCycle which eventually calls GetOrderDetails
+// which calls CheckInventory again - creating the behavioral cycle.
+func CheckInventory(userID string, items []model.OrderItem, depth int) bool {
+	return checkInventoryCycle(userID, items, depth)
+}

@@ -87,3 +87,9 @@ func (s *InventoryServiceClean) CheckStock(productID string, qty int) bool {
 	available, ok := s.stock[productID]
 	return ok && available >= qty
 }
+
+// CheckInventory checks item availability. Clean version: no cycle.
+// Called by OrderService.CreateOrder. Does not call back into order logic.
+func CheckInventory(userID string, items []model.OrderItem, depth int) bool {
+	return len(items) > 0
+}

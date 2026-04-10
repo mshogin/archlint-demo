@@ -1,23 +1,30 @@
 //go:build ignore
 
+// Package handler provides HTTP request handling.
+// STEP 0: Clean starting point.
+// Handler -> Service -> Repo. Correct direction. 0 violations.
 package handler
 
 import (
-	"demo/internal/model"
+	"demo/internal/model"   // domain types
 	"demo/internal/repo"
-	"demo/internal/service"
-	"net/http"
+	"demo/internal/service" // business logic layer - the ONLY allowed dependency toward data
+	"net/http"              // HTTP primitives
 )
 
+// OrderHandler handles HTTP requests for orders.
+// Dependencies: net/http, model, service. Clean architecture.
 type OrderHandler struct {
 	svc   *service.OrderService
 	cache *repo.OrderCache
 }
 
+// NewOrderHandler creates an OrderHandler.
 func NewOrderHandler(svc *service.OrderService, cache *repo.OrderCache) *OrderHandler {
 	return &OrderHandler{svc: svc, cache: cache}
 }
 
+// GetOrder handles GET /orders/{id}.
 func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	id := pathParam(r, "id")
 
@@ -35,6 +42,7 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, order)
 }
 
+// CreateOrder handles POST /orders.
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var req model.CreateOrderRequest
 	if err := decodeJSON(r, &req); err != nil {
