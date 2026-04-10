@@ -66,19 +66,7 @@ func (s *OrderService) Create(userID string, items []model.OrderItem) (*model.Or
 	return o, nil
 }
 
-// Get retrieves an order by ID, using cache when available.
+// Get retrieves an order by ID.
 func (s *OrderService) Get(id string) (*model.Order, error) {
-	if s.cache != nil {
-		if o, ok := s.cache.Get(id); ok {
-			return o, nil
-		}
-	}
-	o, err := s.repo.FindByID(id)
-	if err != nil {
-		return nil, err
-	}
-	if s.cache != nil {
-		s.cache.Set(o)
-	}
-	return o, nil
+	return s.repo.FindByID(id)
 }
