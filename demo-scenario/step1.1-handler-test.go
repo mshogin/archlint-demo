@@ -1,5 +1,5 @@
-// handler_cache_test.go tests the GetOrder handler with caching.
-// Added in step 1.1 together with the caching feature.
+// handler_cache_test.go tests that GetOrder uses caching:
+// two requests for the same order must produce at most one database call.
 package tests
 
 import (
@@ -12,36 +12,53 @@ import (
 	"testing"
 )
 
-// TestHandlerGetOrderCached verifies that GetOrder populates the cache.
-// Uses a separate cache instance for the handler's service so we know
-// the cache is populated by Get, not by Create.
-// Fails if cache logic is removed entirely instead of moved to the correct layer.
+// countingRepo wraps OrderRepo and counts FindByID calls.
+type countingRepo struct {
+	*repo.OrderRepo
+	calls int
+}
+
+func (r *countingRepo) FindByID(id string) (*model.Order, error) {
+	r.calls++
+	return r.OrderRepo.FindByID(id)
+}
+
+// TestHandlerGetOrderCached verifies that two GETs for the same order
+// produce at most one database call — the second must be served from cache.
+// Fails if caching is missing or not in the correct layer.
 func TestHandlerGetOrderCached(t *testing.T) {
-	// Create the order using one service instance (its cache is irrelevant here).
-	orderRepo := repo.NewOrderRepo()
-	createSvc := service.NewOrderService(orderRepo, repo.NewOrderCache())
+	cr := &countingRepo{OrderRepo: repo.NewOrderRepo()}
+
+	// Create order via a separate service (its cache is irrelevant here).
+	createSvc := service.NewOrderService(cr, repo.NewOrderCache())
 	items := []model.OrderItem{{ProductID: "p-001", Quantity: 1, Price: 15.00}}
 	created, err := createSvc.Create("user-test", items)
 	if err != nil {
 		t.Fatalf("Create failed: %v", err)
 	}
+	cr.calls = 0 // reset counter after create
 
 	// Handler uses a fresh service with an empty cache.
-	getCache := repo.NewOrderCache()
-	getSvc := service.NewOrderService(orderRepo, getCache)
+	getSvc := service.NewOrderService(cr, repo.NewOrderCache())
 	h := handler.NewOrderHandler(getSvc)
 
-	req := httptest.NewRequest(http.MethodGet, "/orders/"+created.ID, nil)
-	w := httptest.NewRecorder()
-	h.GetOrder(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Errorf("expected 200, got %d", w.Code)
+	// First GET — hits the database.
+	req1 := httptest.NewRequest(http.MethodGet, "/orders/"+created.ID, nil)
+	w1 := httptest.NewRecorder()
+	h.GetOrder(w1, req1)
+	if w1.Code != http.StatusOK {
+		t.Errorf("first GET: expected 200, got %d", w1.Code)
 	}
 
-	// After GetOrder, the order must be in cache.
-	// Fails if cache was removed instead of moved to the service layer.
-	if _, ok := getCache.Get(created.ID); !ok {
-		t.Error("GetOrder must populate the cache: cache logic missing or in wrong layer")
+	// Second GET — must be served from cache, not the database.
+	req2 := httptest.NewRequest(http.MethodGet, "/orders/"+created.ID, nil)
+	w2 := httptest.NewRecorder()
+	h.GetOrder(w2, req2)
+	if w2.Code != http.StatusOK {
+		t.Errorf("second GET: expected 200, got %d", w2.Code)
+	}
+
+	if cr.calls > 1 {
+		t.Errorf("expected 1 DB call (second GET from cache), got %d: caching missing or in wrong layer", cr.calls)
 	}
 }
