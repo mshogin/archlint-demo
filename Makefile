@@ -76,5 +76,6 @@ reset: step0
 	rm -f tests/handler_cache_test.go tests/fulfillment_test.go
 	$(call copy_step,step0-fulfillment-clean.go,internal/service/fulfillment.go)
 	rm -f callgraph-entries.yaml
+	git checkout -- internal/service/order.go
 
 .PHONY: step0 step1 step1.1 step2 step2.1 step3 step4 collect watch test guardian demo reset
