@@ -12,20 +12,24 @@ import (
 	"testing"
 )
 
-// TestHandlerGetOrderCached verifies that GetOrder returns a cached order correctly.
+// TestHandlerGetOrderCached verifies that GetOrder populates the cache.
+// Uses a separate cache instance for the handler's service so we know
+// the cache is populated by Get, not by Create.
+// Fails if cache logic is removed entirely instead of moved to the correct layer.
 func TestHandlerGetOrderCached(t *testing.T) {
+	// Create the order using one service instance (its cache is irrelevant here).
 	orderRepo := repo.NewOrderRepo()
-	cache := repo.NewOrderCache()
-	svc := service.NewOrderService(orderRepo, cache)
-	h := handler.NewOrderHandler(svc)
-
-	items := []model.OrderItem{
-		{ProductID: "p-001", Quantity: 1, Price: 15.00},
-	}
-	created, err := svc.Create("user-test", items)
+	createSvc := service.NewOrderService(orderRepo, repo.NewOrderCache())
+	items := []model.OrderItem{{ProductID: "p-001", Quantity: 1, Price: 15.00}}
+	created, err := createSvc.Create("user-test", items)
 	if err != nil {
 		t.Fatalf("Create failed: %v", err)
 	}
+
+	// Handler uses a fresh service with an empty cache.
+	getCache := repo.NewOrderCache()
+	getSvc := service.NewOrderService(orderRepo, getCache)
+	h := handler.NewOrderHandler(getSvc)
 
 	req := httptest.NewRequest(http.MethodGet, "/orders/"+created.ID, nil)
 	w := httptest.NewRecorder()
@@ -33,5 +37,11 @@ func TestHandlerGetOrderCached(t *testing.T) {
 
 	if w.Code != http.StatusOK {
 		t.Errorf("expected 200, got %d", w.Code)
+	}
+
+	// After GetOrder, the order must be in cache.
+	// Fails if cache was removed instead of moved to the service layer.
+	if _, ok := getCache.Get(created.ID); !ok {
+		t.Error("GetOrder must populate the cache: cache logic missing or in wrong layer")
 	}
 }
