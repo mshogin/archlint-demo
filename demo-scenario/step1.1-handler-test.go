@@ -12,15 +12,13 @@ import (
 	"testing"
 )
 
-// TestHandlerGetOrderFromCache verifies that GetOrder returns an order correctly.
-// The handler uses an OrderCache directly (step 1.1 pattern).
-func TestHandlerGetOrderFromCache(t *testing.T) {
+// TestHandlerGetOrderCached verifies that GetOrder returns a cached order correctly.
+func TestHandlerGetOrderCached(t *testing.T) {
 	orderRepo := repo.NewOrderRepo()
 	cache := repo.NewOrderCache()
 	svc := service.NewOrderService(orderRepo, cache)
-	h := handler.NewOrderHandler(svc, cache)
+	h := handler.NewOrderHandler(svc)
 
-	// Create an order via service so it exists in repo and cache.
 	items := []model.OrderItem{
 		{ProductID: "p-001", Quantity: 1, Price: 15.00},
 	}
@@ -29,12 +27,11 @@ func TestHandlerGetOrderFromCache(t *testing.T) {
 		t.Fatalf("Create failed: %v", err)
 	}
 
-	// GET /orders/{id} — handler should return 200 with the order.
 	req := httptest.NewRequest(http.MethodGet, "/orders/"+created.ID, nil)
 	w := httptest.NewRecorder()
 	h.GetOrder(w, req)
 
 	if w.Code != http.StatusOK {
-		t.Errorf("expected status 200, got %d", w.Code)
+		t.Errorf("expected 200, got %d", w.Code)
 	}
 }

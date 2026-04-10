@@ -7,7 +7,7 @@ package handler
 
 import (
 	"demo/internal/model"   // domain types
-	"demo/internal/repo"
+	"demo/internal/repo"    // added for local cache - VIOLATION
 	"demo/internal/service" // business logic layer - the ONLY allowed dependency toward data
 	"net/http"              // HTTP primitives
 )
@@ -16,12 +16,12 @@ import (
 // Dependencies: net/http, model, service. Clean architecture.
 type OrderHandler struct {
 	svc   *service.OrderService
-	cache *repo.OrderCache
+	cache *repo.OrderCache // handler owns cache directly - wrong layer
 }
 
 // NewOrderHandler creates an OrderHandler.
-func NewOrderHandler(svc *service.OrderService, cache *repo.OrderCache) *OrderHandler {
-	return &OrderHandler{svc: svc, cache: cache}
+func NewOrderHandler(svc *service.OrderService) *OrderHandler {
+	return &OrderHandler{svc: svc, cache: repo.NewOrderCache()}
 }
 
 // GetOrder handles GET /orders/{id}.
@@ -39,6 +39,7 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.cache.Set(order)
 	writeJSON(w, http.StatusOK, order)
 }
 
