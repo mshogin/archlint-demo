@@ -45,6 +45,10 @@ collect:
 watch:
 	$(ARCHLINT) watch ./internal/
 
+## Architecture Guardian - watch + auto-fix violations via Claude (Ctrl+C to stop)
+guardian:
+	@bash scripts/arch-guardian.sh
+
 ## Full demo sequence
 demo: step0 step1 step3 step2 step4
 	@echo ""
@@ -53,4 +57,4 @@ demo: step0 step1 step3 step2 step4
 ## Reset to clean state
 reset: step0
 
-.PHONY: step0 step1 step2 step3 step4 collect watch demo reset
+.PHONY: step0 step1 step2 step3 step4 collect watch guardian demo reset

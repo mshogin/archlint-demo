@@ -1,4 +1,3 @@
-//go:build ignore
 
 // step0-behavior-clean.go - OrderService WITHOUT behavioral cycle.
 //
